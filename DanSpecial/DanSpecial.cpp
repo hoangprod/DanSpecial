@@ -179,6 +179,9 @@ int main(int argc, char* argv[])
 
 	offset_check(); // Make sure we have the offsets for the thingy thing
 
+	printf("[+] Please make sure your version is detected correctly. Incorrect version detection will leads to BSOD. Submit bug to github if the version is detected incorrect.\n");
+	printf("[+] Press any key to proceed.\n");
+	getchar();
 
 	// Converting args to a usable int in a very terrible way
 	int bLoadDriver = atoi(argv[1]);
