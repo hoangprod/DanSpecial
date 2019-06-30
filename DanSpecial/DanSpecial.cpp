@@ -159,7 +159,7 @@ void offset_check()
 		break;
 	default:
 		printf("[-] Unsupported OS detected, this won't work or too risky to try!\n");
-		break;
+		exit(0);
 	}
 }
 
@@ -178,6 +178,7 @@ int main(int argc, char* argv[])
 	}
 
 	offset_check(); // Make sure we have the offsets for the thingy thing
+
 
 	// Converting args to a usable int in a very terrible way
 	int bLoadDriver = atoi(argv[1]);
