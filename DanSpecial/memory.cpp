@@ -41,6 +41,8 @@ uintptr_t unmap_physical(HANDLE driver, uintptr_t address)
 
 uintptr_t find_directory_base(HANDLE driver)
 {
+	printf("[+] Attempting to find Dirbase.\n");
+
 	for (int i = 0; i < 10; i++)
 	{
 		uintptr_t lpBuffer = map_physical(driver, i * 0x10000, 0x10000);

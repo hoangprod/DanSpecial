@@ -26,6 +26,7 @@ bool write_virtual_memory(HANDLE driver, uintptr_t pml4, uintptr_t address, LPVO
 		return false;
 
 	write_physical_memory(driver, physical_address, data, size);
+
 	return true;
 }
 

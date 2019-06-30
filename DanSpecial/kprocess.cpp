@@ -94,6 +94,9 @@ uintptr_t find_kprocess(HANDLE driver, const char* image_name, uintptr_t& virtua
 
 uintptr_t find_kprocess(HANDLE driver, const char* image_name, DWORD pid, uintptr_t& virtual_size_out, uintptr_t& directory_base_out)
 {
+	printf("[+] Attempting to find kprocess.\n");
+
+
 	uintptr_t pml4 = find_directory_base(driver);
 
 	if (!pml4)
@@ -173,6 +176,7 @@ uintptr_t leak_kprocess(HANDLE driver, uintptr_t pml4)
 	// these are 98% guaranteed to be eprocess struct pointers
 	// some validation will be required after, only one valid
 	// pointer is required
+	printf("[+] Attempting to leak kprocess.\n");
 
 	std::vector<uintptr_t> pointers;
 
